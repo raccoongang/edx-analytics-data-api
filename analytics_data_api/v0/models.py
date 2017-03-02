@@ -43,6 +43,7 @@ class CourseActivityWeekly(BaseCourseModel):
 class BaseCourseEnrollment(BaseCourseModel):
     date = models.DateField(null=False, db_index=True)
     count = models.IntegerField(null=False)
+    cumulative_count = models.IntegerField(null=False)
 
     class Meta(BaseCourseModel.Meta):
         abstract = True
@@ -87,6 +88,7 @@ class CourseMetaSummaryEnrollment(BaseCourseModel):
 
 class CourseEnrollmentByBirthYear(BaseCourseEnrollment):
     birth_year = models.IntegerField(null=False)
+    cumulative_count = models.IntegerField(null=False)
 
     class Meta(BaseCourseEnrollment.Meta):
         db_table = 'course_enrollment_birth_year_daily'
@@ -96,6 +98,7 @@ class CourseEnrollmentByBirthYear(BaseCourseEnrollment):
 
 class CourseEnrollmentByEducation(BaseCourseEnrollment):
     education_level = models.CharField(max_length=255, null=True)
+    cumulative_count = models.IntegerField(null=False)
 
     class Meta(BaseCourseEnrollment.Meta):
         db_table = 'course_enrollment_education_level_daily'
@@ -111,6 +114,7 @@ class CourseEnrollmentByGender(BaseCourseEnrollment):
     }
 
     gender = models.CharField(max_length=255, null=True, db_column='gender')
+    cumulative_count = models.IntegerField(null=False)
 
     @property
     def cleaned_gender(self):
@@ -137,6 +141,7 @@ class BaseProblemResponseAnswerDistribution(BaseCourseModel):
     correct = models.NullBooleanField()
     value_id = models.CharField(db_index=True, max_length=255, null=True)
     answer_value = models.TextField(null=True, db_column='answer_value_text')
+    answer_value_numeric = models.FloatField(null=True, blank=True) 
     variant = models.IntegerField(null=True)
     problem_display_name = models.TextField(null=True)
     question_text = models.TextField(null=True)
@@ -241,7 +246,7 @@ class Video(BaseVideo):
     segment_length = models.IntegerField()
     users_at_start = models.IntegerField()
     users_at_end = models.IntegerField()
-
+    total_viewed_seconds = models.IntegerField()
     class Meta(BaseVideo.Meta):
         db_table = 'video'
 
