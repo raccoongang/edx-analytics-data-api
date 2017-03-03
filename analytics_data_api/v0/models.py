@@ -69,13 +69,13 @@ class CourseEnrollmentModeDaily(BaseCourseEnrollment):
 
 
 class CourseMetaSummaryEnrollment(BaseCourseModel):
-    catalog_course_title = models.CharField(db_index=True, max_length=255)
-    catalog_course = models.CharField(db_index=True, max_length=255)
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-    pacing_type = models.CharField(db_index=True, max_length=255)
-    availability = models.CharField(db_index=True, max_length=255)
-    enrollment_mode = models.CharField(max_length=255)
+    catalog_course_title = models.CharField(db_index=True, max_length=255, null=True)
+    catalog_course = models.CharField(db_index=True, max_length=255, null=True)
+    start_time = models.DateTimeField(null=True)
+    end_time = models.DateTimeField(null=True)
+    pacing_type = models.CharField(db_index=True, max_length=255, null=True)
+    availability = models.CharField(db_index=True, max_length=255, null=True)
+    enrollment_mode = models.CharField(max_length=255, null=True)
     count = models.IntegerField(null=False)
     cumulative_count = models.IntegerField(null=False)
     count_change_7_days = models.IntegerField(default=0)
@@ -87,7 +87,7 @@ class CourseMetaSummaryEnrollment(BaseCourseModel):
 
 
 class CourseEnrollmentByBirthYear(BaseCourseEnrollment):
-    birth_year = models.IntegerField(null=False)
+    birth_year = models.IntegerField(null=True)
     cumulative_count = models.IntegerField(null=False)
 
     class Meta(BaseCourseEnrollment.Meta):
@@ -180,7 +180,7 @@ class ProblemFirstLastResponseAnswerDistribution(BaseProblemResponseAnswerDistri
 
 
 class CourseEnrollmentByCountry(BaseCourseEnrollment):
-    country_code = models.CharField(max_length=255, null=False, db_column='country_code')
+    country_code = models.CharField(max_length=255, null=True, db_column='country_code')
 
     @property
     def country(self):
@@ -246,7 +246,7 @@ class Video(BaseVideo):
     segment_length = models.IntegerField()
     users_at_start = models.IntegerField()
     users_at_end = models.IntegerField()
-    total_viewed_seconds = models.IntegerField()
+    total_viewed_seconds = models.IntegerField(null=True)
     class Meta(BaseVideo.Meta):
         db_table = 'video'
 
