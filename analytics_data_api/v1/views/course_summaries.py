@@ -150,8 +150,8 @@ class CourseSummariesView(
         'passing_users',
     ])
     _TZ = timezone.get_default_timezone()
-    _MIN_DATETIME = timezone.make_aware(timezone.datetime.min, _TZ)
-    _MAX_DATETIME = timezone.make_aware(timezone.datetime.max, _TZ)
+    _MIN_DATETIME = timezone.datetime.min.replace(tzinfo=_TZ)
+    _MAX_DATETIME = timezone.datetime.max.replace(tzinfo=_TZ)
 
     # From IDsAPIViewMixin
     id_field = 'course_id'
