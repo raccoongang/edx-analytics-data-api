@@ -3,9 +3,9 @@
 import copy
 import datetime
 import json
+import uuid
 from itertools import groupby
 from unittest.mock import Mock, patch
-import uuid
 
 import ddt
 from django.conf import settings

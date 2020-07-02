@@ -1,8 +1,8 @@
 
 from django.conf import settings
-from elasticsearch_dsl import Q, Date, Document, Text, Integer, Keyword, Float
+from elasticsearch_dsl import Date, Document, Float, Integer, Keyword, Q, Text
 
-from analytics_data_api.constants import country, genders, learner
+from analytics_data_api.constants import learner
 
 
 class RosterUpdate(Document):
