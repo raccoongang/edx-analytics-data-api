@@ -1,6 +1,6 @@
 
 from django.conf import settings
-from elasticsearch_dsl import Date, Document, Float, Integer, Keyword, Q, Text
+from elasticsearch_dsl import Date, Document, Float, Integer, Keyword, Q
 
 from analytics_data_api.constants import learner
 
@@ -11,23 +11,14 @@ class RosterUpdate(Document):
     """
 
     date = Date()
-    target_index = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
+    target_index = Keyword()
 
     class Index:
         name = settings.ELASTICSEARCH_LEARNERS_UPDATE_INDEX
-        settings = {
-            'number_of_shards': 1,
-            'number_of_replicas': 0
-        }
 
     @classmethod
     def get_last_updated(cls):
-        temp = cls.search().query('match', target_index=settings.ELASTICSEARCH_LEARNERS_INDEX).execute()
-        return temp
+        return cls.search().query('term', target_index=settings.ELASTICSEARCH_LEARNERS_INDEX).execute()
 
 
 class RosterEntry(Document):
@@ -35,144 +26,45 @@ class RosterEntry(Document):
     Index which store learner information of a course.
     """
 
-    course_id = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    user_id = Integer(
-        fields={
-            'raw': Integer(),
-        }
-    )
-    username = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    name = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    email = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    language = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    location = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    year_of_birth = Integer(
-        fields={
-            'raw': Integer(),
-        }
-    )
-    level_of_education = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    gender = Text(
-        fields={
-            'raw': Text(),
-        }
-    )
-    mailing_address = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    city = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    country = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    goals = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    enrollment_mode = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    cohort = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )
-    segments = Keyword(
-        fields={
-            'raw': Keyword(),
-        }
-    )  # segments is an array/list of strings
-    problems_attempted = Integer(
-        fields={
-            'raw': Integer(),
-        }
-    )
-    problems_completed = Integer(
-        fields={
-            'raw': Integer(),
-        }
-    )
-    problem_attempts_per_completed = Float(
-        fields={
-            'raw': Float(),
-        }
-    )
+    course_id = Keyword()
+    user_id = Integer()
+    username = Keyword()
+    name = Keyword()
+    email = Keyword()
+    language = Keyword()
+    location = Keyword()
+    year_of_birth = Integer()
+    level_of_education = Keyword()
+    gender = Keyword()
+    mailing_address = Keyword()
+    city = Keyword()
+    country = Keyword()
+    goals = Keyword()
+    enrollment_mode = Keyword()
+    cohort = Keyword()
+    segments = Keyword()  # segments is an array/list of strings
+    problems_attempted = Integer()
+    problems_completed = Integer()
+    problem_attempts_per_completed = Float()
     # Useful for ordering problem_attempts_per_completed (because results can include null, which is
     # different from zero).  attempt_ratio_order is equal to the number of problem attempts if
     # problem_attempts_per_completed is > 1 and set to -problem_attempts if
     # problem_attempts_per_completed = 1.
-    attempt_ratio_order = Integer(
-        fields={
-            'raw': Integer(),
-        }
-    )
-    discussion_contributions = Integer(
-        fields={
-            'raw': Integer(),
-        }
-    )
-    videos_watched = Integer(
-        fields={
-            'raw': Integer(),
-        }
-    )
+    attempt_ratio_order = Integer()
+    discussion_contributions = Integer()
+    videos_watched = Integer()
     enrollment_date = Date()
     last_updated = Date()
 
     class Index:
         name = settings.ELASTICSEARCH_LEARNERS_INDEX
-        settings = {
-            'number_of_shards': 1,
-            'number_of_replicas': 0
-        }
-
-    class Django:
-        pass
 
     @classmethod
     def get_course_user(cls, course_id, username):
         """
         Search learner in course.
         """
-        return cls.search().query('match', course_id=course_id).query('match', username=username).execute()
+        return cls.search().query('term', course_id=course_id).query('term', username=username).execute()
 
     @classmethod
     def get_users_in_course(
@@ -231,18 +123,18 @@ class RosterEntry(Document):
                 ))
 
         search = cls.search()
-        search.query = Q('bool', must=[Q('match', course_id=course_id)])
+        search.query = Q('bool', must=[Q('term', course_id=course_id)])
 
         # Filtering/Search
         if segments:
-            search.query.must.append(Q('bool', should=[Q('match', segments=segment) for segment in segments]))
+            search.query.must.append(Q('bool', should=[Q('term', segments=segment) for segment in segments]))
         elif ignore_segments:
             for segment in ignore_segments:
-                search = search.query(~Q('match', segments=segment))  # pylint: disable=invalid-unary-operand-type
+                search = search.query(~Q('term', segments=segment))  # pylint: disable=invalid-unary-operand-type
         if cohort:
-            search = search.query('match', cohort=cohort)
+            search = search.query('term', cohort=cohort)
         if enrollment_mode:
-            search = search.query('match', enrollment_mode=enrollment_mode)
+            search = search.query('term', enrollment_mode=enrollment_mode)
         if text_search:
             search.query.must.append(Q('multi_match', query=text_search, fields=['name', 'username', 'email']))
         # construct the sort hierarchy
@@ -281,7 +173,7 @@ class RosterEntry(Document):
         page_size = getattr(settings, 'AGGREGATE_PAGE_SIZE', 10)
 
         search = cls.search()
-        search.query = Q('bool', must=[Q('match', course_id=course_id)])
+        search.query = Q('bool', must=[Q('term', course_id=course_id)])
         search.aggs.bucket('enrollment_modes', 'terms', field='enrollment_mode', size=page_size)
         search.aggs.bucket('segments', 'terms', field='segments', size=page_size)
         search.aggs.bucket('cohorts', 'terms', field='cohort', size=page_size)
