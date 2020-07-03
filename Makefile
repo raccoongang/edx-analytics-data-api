@@ -112,9 +112,15 @@ travis: clean test.requirements migrate-all
 	python manage.py set_api_key edx edx
 	python manage.py loaddata problem_response_answer_distribution --database=analytics
 	python manage.py generate_fake_course_data --num-weeks=2 --no-videos --course-id "edX/DemoX/Demo_Course"
+
 docker_build:
 	docker build . -f Dockerfile -t openedx/analytics-data-api
 	docker build . -f Dockerfile --target newrelic -t openedx/analytics-data-api:latest-newrelic
+
+travis.test: tox.requirements clean
+	tox -e $(PYTHON_ENV)-$(DJANGO_VERSION)-tests
+	export COVERAGE_DIR=$(COVERAGE_DIR) && \
+	tox -e $(PYTHON_ENV)-$(DJANGO_VERSION)-coverage
 
 travis_docker_tag: docker_build
 	docker tag openedx/analytics-data-api openedx/analytics-data-api:$$TRAVIS_COMMIT
