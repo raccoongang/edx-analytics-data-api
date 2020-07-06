@@ -1,6 +1,6 @@
 
 from django.conf import settings
-from elasticsearch_dsl import Date, Document, Float, Integer, Keyword, Q
+from elasticsearch_dsl import Date, Document, Float, Keyword, Q, Short
 
 from analytics_data_api.constants import learner
 
@@ -15,6 +15,7 @@ class RosterUpdate(Document):
 
     class Index:
         name = settings.ELASTICSEARCH_LEARNERS_UPDATE_INDEX
+        settings = settings.ELASTICSEARCH_INDEX_SETTINGS
 
     @classmethod
     def get_last_updated(cls):
@@ -27,13 +28,13 @@ class RosterEntry(Document):
     """
 
     course_id = Keyword()
-    user_id = Integer()
+    user_id = Short()
     username = Keyword()
     name = Keyword()
     email = Keyword()
     language = Keyword()
     location = Keyword()
-    year_of_birth = Integer()
+    year_of_birth = Short()
     level_of_education = Keyword()
     gender = Keyword()
     mailing_address = Keyword()
@@ -43,21 +44,22 @@ class RosterEntry(Document):
     enrollment_mode = Keyword()
     cohort = Keyword()
     segments = Keyword()  # segments is an array/list of strings
-    problems_attempted = Integer()
-    problems_completed = Integer()
+    problems_attempted = Short()
+    problems_completed = Short()
     problem_attempts_per_completed = Float()
     # Useful for ordering problem_attempts_per_completed (because results can include null, which is
     # different from zero).  attempt_ratio_order is equal to the number of problem attempts if
     # problem_attempts_per_completed is > 1 and set to -problem_attempts if
     # problem_attempts_per_completed = 1.
-    attempt_ratio_order = Integer()
-    discussion_contributions = Integer()
-    videos_watched = Integer()
+    attempt_ratio_order = Short()
+    discussion_contributions = Short()
     enrollment_date = Date()
+    videos_viewed = Short()
     last_updated = Date()
 
     class Index:
         name = settings.ELASTICSEARCH_LEARNERS_INDEX
+        settings = settings.ELASTICSEARCH_INDEX_SETTINGS
 
     @classmethod
     def get_course_user(cls, course_id, username):
