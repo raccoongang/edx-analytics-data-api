@@ -1,6 +1,6 @@
 
 from django.conf import settings
-from elasticsearch_dsl import Date, Document, Float, Keyword, Q, Short
+from elasticsearch_dsl import Date, Document, Float, Integer, Keyword, Q, Short
 
 from analytics_data_api.constants import learner
 
@@ -28,7 +28,7 @@ class RosterEntry(Document):
     """
 
     course_id = Keyword()
-    user_id = Short()
+    user_id = Integer()
     username = Keyword()
     name = Keyword()
     email = Keyword()
