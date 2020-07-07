@@ -58,12 +58,12 @@ clean: tox.requirements
 	tox -e $(PYTHON_ENV)-$(DJANGO_VERSION)-clean
 	find . -name '*.pyc' -delete
 
-test: tox.requirements clean
-	make test.run_elasticsearch
+main.test: tox.requirements clean
 	tox -e $(PYTHON_ENV)-$(DJANGO_VERSION)-tests
 	export COVERAGE_DIR=$(COVERAGE_DIR) && \
 	tox -e $(PYTHON_ENV)-$(DJANGO_VERSION)-coverage
-	make test.stop_elasticsearch
+
+test: test.run_elasticsearch main.test test.stop_elasticsearch
 
 diff.report: test.requirements
 	diff-cover $(COVERAGE_DIR)/coverage.xml --html-report $(COVERAGE_DIR)/diff_cover.html
@@ -116,11 +116,6 @@ travis: clean test.requirements migrate-all
 docker_build:
 	docker build . -f Dockerfile -t openedx/analytics-data-api
 	docker build . -f Dockerfile --target newrelic -t openedx/analytics-data-api:latest-newrelic
-
-travis.test: tox.requirements clean
-	tox -e $(PYTHON_ENV)-$(DJANGO_VERSION)-tests
-	export COVERAGE_DIR=$(COVERAGE_DIR) && \
-	tox -e $(PYTHON_ENV)-$(DJANGO_VERSION)-coverage
 
 travis_docker_tag: docker_build
 	docker tag openedx/analytics-data-api openedx/analytics-data-api:$$TRAVIS_COMMIT

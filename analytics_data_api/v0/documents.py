@@ -80,8 +80,7 @@ class RosterEntry(Document):
             sort_policies=None,
     ):
         """
-        Construct a search query for all users in `course_id` and return
-        the Search object.
+        Construct a search query for all users in `course_id` and return the Search object.
 
         sort_policies is an array, where the first element is the primary sort.
         Elements in the array are dicts with fields: order_by (field to sort by)
@@ -91,10 +90,7 @@ class RosterEntry(Document):
         """
 
         if not sort_policies:
-            sort_policies = [{
-                'order_by': None,
-                'sort_order': None
-            }]
+            sort_policies = [{'order_by': None, 'sort_order': None}]
         # set default sort policy to 'username' and 'asc'
         for field, default in [('order_by', 'username'), ('sort_order', 'asc')]:
             if sort_policies[0][field] is None:
@@ -103,7 +99,7 @@ class RosterEntry(Document):
         # Error handling
         if segments and ignore_segments:
             raise ValueError('Cannot combine `segments` and `ignore_segments` parameters.')
-        for segment in (segments or list()) + (ignore_segments or list()):
+        for segment in (segments or []) + (ignore_segments or []):
             if segment not in learner.SEGMENTS:
                 raise ValueError("segments/ignore_segments value '{segment}' must be one of: ({segments})".format(
                     segment=segment, segments=', '.join(learner.SEGMENTS)
@@ -179,25 +175,15 @@ class RosterEntry(Document):
         search.aggs.bucket('enrollment_modes', 'terms', field='enrollment_mode', size=page_size)
         search.aggs.bucket('segments', 'terms', field='segments', size=page_size)
         search.aggs.bucket('cohorts', 'terms', field='cohort', size=page_size)
-        response = search.execute()
+        response = search.execute().to_dict()
 
         # Build up the map of aggregation name to count
-        segments = response.aggregations.segments
-        enrollment_modes = response.aggregations.enrollment_modes
-        cohorts = response.aggregations.cohorts
-
-        aggregations = dict()
-        aggregations['enrollment_modes'] = {
-            enrollment_mode['key']: enrollment_mode['doc_count']
-            for enrollment_mode in enrollment_modes
-        }
-        aggregations['segments'] = {
-            segment['key']: segment['doc_count']
-            for segment in segments
-        }
-        aggregations['cohorts'] = {
-            cohort['key']: cohort['doc_count']
-            for cohort in cohorts
+        aggregations = {
+            agg_field: {
+                bucket['key']: bucket['doc_count']
+                for bucket in agg_item['buckets']
+            }
+            for agg_field, agg_item in response['aggregations'].items()
         }
 
         # Add default values of 0 for segments with no learners

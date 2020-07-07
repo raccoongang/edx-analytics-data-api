@@ -3,7 +3,6 @@
 import copy
 import datetime
 import json
-import uuid
 from itertools import groupby
 from unittest.mock import Mock, patch
 
@@ -100,7 +99,6 @@ class LearnerAPITestMixin(CsvViewMixin):
 
         self._es.index(
             index=settings.ELASTICSEARCH_LEARNERS_INDEX,
-            id=uuid.uuid4(),
             body=body
         )
 
@@ -122,7 +120,6 @@ class LearnerAPITestMixin(CsvViewMixin):
         """
         self._es.index(
             index=settings.ELASTICSEARCH_LEARNERS_UPDATE_INDEX,
-            id=uuid.uuid4(),
             body={
                 'date': date,
                 'target_index': settings.ELASTICSEARCH_LEARNERS_INDEX,

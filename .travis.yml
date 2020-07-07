@@ -18,14 +18,14 @@ matrix:
   - python: 3.5
     env: TESTNAME=quality-python-3.5 TARGETS="PYTHON_ENV=py35 quality"
   - python: 3.5
-    env: TESTNAME=test-python-3.5 TARGETS="PYTHON_ENV=py35 travis.test"
+    env: TESTNAME=test-python-3.5 TARGETS="PYTHON_ENV=py35 main.test"
     after_success:
     - docker exec analytics_api_testing /edx/app/analytics_api/analytics_api/.travis/run_coverage.sh
     - codecov --disable pycov
   - python: 3.8
     env: TESTNAME=quality-python-3.8 TARGETS="PYTHON_ENV=py38 quality"
   - python: 3.8
-    env: TESTNAME=test-python-3.8 TARGETS="PYTHON_ENV=py38 travis.test"
+    env: TESTNAME=test-python-3.8 TARGETS="PYTHON_ENV=py38 main.test"
 env:
   global:
   - DOCKER_USERNAME=edxbuilder

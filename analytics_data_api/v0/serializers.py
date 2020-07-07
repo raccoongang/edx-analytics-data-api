@@ -364,17 +364,13 @@ class LearnerSerializer(serializers.Serializer):
     cohort = serializers.SerializerMethodField()
 
     def get_segments(self, obj):
-        # using hasattr() instead because DocType.get() is overloaded and makes a request
-        if hasattr(obj, 'segments') and obj.segments:
+        if getattr(obj, 'segments'):
             # json parsing will fail unless in unicode
             return [six.text_type(segment) for segment in obj.segments]
         return []
 
     def get_cohort(self, obj):
-        # using hasattr() instead because DocType.get() is overloaded and makes a request
-        if hasattr(obj, 'cohort') and obj.cohort and len(obj.cohort) > 0:
-            return obj.cohort
-        return None
+        return getattr(obj, 'cohort')
 
     def get_account_url(self, obj):
         if settings.LMS_USER_ACCOUNT_BASE_URL:
