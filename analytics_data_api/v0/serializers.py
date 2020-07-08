@@ -361,16 +361,13 @@ class LearnerSerializer(serializers.Serializer):
     segments = serializers.SerializerMethodField()
     engagements = serializers.SerializerMethodField()
     enrollment_date = serializers.DateTimeField(format=settings.DATE_FORMAT)
-    cohort = serializers.SerializerMethodField()
+    cohort = serializers.CharField(default=None, allow_null=True)
 
     def get_segments(self, obj):
         if getattr(obj, 'segments'):
             # json parsing will fail unless in unicode
             return [six.text_type(segment) for segment in obj.segments]
         return []
-
-    def get_cohort(self, obj):
-        return getattr(obj, 'cohort')
 
     def get_account_url(self, obj):
         if settings.LMS_USER_ACCOUNT_BASE_URL:
